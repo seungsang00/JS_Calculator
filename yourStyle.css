@@ -1,4 +1,5 @@
 /* TODO : CSS파일을 편집하여 원하는 스타일의 계산기를 만들어보세요 :) */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&display=swap');
 
 /* global */
 * {
@@ -6,12 +7,19 @@
   padding: 0;
   border: 0px;
   box-sizing: border-box;
-  font-family: 'Righteous', cursive;
-  color: #000;
+  /* font-family: 'Righteous', cursive; */
+  font-family: 'Quicksand', sans-serif;
+  color: #566270;
+  font-weight: 500;
 }
 
 body {
   background-image: url('./data/codestates-motif.png');
+}
+
+button {
+  font-size: 18px;
+  /* box-shadow: 0 0 10px #E0E3DA; */
 }
 
 /*
@@ -26,8 +34,8 @@ body {
 }
 
 .calculator {
-  background-color: #4000c7;
-  width: 350px;
+  background-color: #FFFFF3;
+  width: 300px;
   height: 500px;
   border-radius: 10px;
   padding: 30px 20px;
@@ -36,13 +44,14 @@ body {
 .calculator__display--bare {
   /* display: none; */
   background-color: #ffffff;
-  text-align: center;
+  text-align: right;
   vertical-align: middle;
   height: 100px;
   width: 100%;
   border-radius: 10px;
-  font-size: 20px;
-  padding: 25px 15px;
+  font-size: 24px;
+  color: white;
+  padding: 25px 5px;
   overflow: hidden;
   overflow-wrap: break-word;
 }
@@ -50,13 +59,25 @@ body {
 .calculator__display--bare > span {
   display: inline-block;
   text-align: center;
-  background-color: #f3f0fc;
-  margin: 5px;
-  width: 40px;
-  height: 45px;
+  /* background-color: #f3f0fc; */
+  /* margin: 5px 0; */
+  /* width: 40px; */
+  height: 60px;
   border-radius: 10px;
-  font-size: 20px;
-  padding: 10px 5px;
+  font-size: 30px;
+  padding: 5px 5px;
+  color: #E0E3DA;
+  font-weight: 400;
+  vertical-align: top;
+  line-height: 2.1;
+}
+
+/* 결과값만 글자를 크게, 색도 더 진하게 */
+.calculator__display--bare > span.calculator__result { 
+  /* width: 40px; width를 지정하니까 자릿수가 올라가면 숫자가 전부 보이지 않는 문제 발생*/ 
+  font-size: 45px;
+  color: #566270;
+  line-height: normal;
 }
 
 .calculator__display--intermediate {
@@ -65,7 +86,7 @@ body {
   height: 100px;
   width: 100%;
   border-radius: 10px;
-  font-size: 20px;
+  font-size: 24px;
   text-align: center;
   vertical-align: middle;
   padding: 25px 15px;
@@ -74,52 +95,62 @@ body {
 }
 
 .calculator__buttons {
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
   width: 100%;
   height: 330px;
   margin-top: 10px;
-  padding: 10px;
+  /* padding: 10px; */
   border-radius: 10px;
+  text-align: center;
 }
 
 .clear__and__enter {
-  height: 50px;
-  margin: 10px;
-  background-color: #f3f0fc;
+  height: 60px;
+  margin: 5px 0;
+  /* background-color: #f3f0fc; */
 }
 
 .clear__and__enter > button {
-  border-radius: 10px;
-  width: 50px;
-  height: 40px;
-  margin: 0px 5px;
-  background-color: #00da75;
+  border-radius: 30px;
+  width: 60px;
+  height: 60px;
+  color: #fff;
+  /* margin: 0px 1px; */
+  background-color: #F6B352;
   cursor: pointer;
   outline: none;
+}
+
+.clear__and__enter > button.calculate {
+  background-color: #2EC4B6;
+  width: 188px;
 }
 
 .button__row {
-  height: 50px;
-  margin: 10px;
-  background-color: #f3f0fc;
+  height: 60px;
+  margin: 10px 0;
+  /* background-color: #f3f0fc; */
 }
 
 .button__row > button {
-  width: 50px;
-  height: 40px;
-  border-radius: 10px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
   cursor: pointer;
   outline: none;
   background-color: #ebebeb;
+  color: #566270;
 }
 
-.button__row > .operator {
+.button__row > .operator, .button__row > .decimal { /* .button__row > .operator, .decimal 로 했을 때는 적용 안됨 */
   color: #ffffff;
-  background-color: #313132;
+  background-color: #566270;
 }
 
 .button__row > .double {
-  width: 115px;
+  width: 125px;
+  border-radius: 30px;
+  color: #566270;
 }
 
 .button__row > .isPressed {
