@@ -34,7 +34,7 @@ button {
 }
 
 .calculator {
-  background-color: #FFFFF3;
+  background-color: #fcfcfc;
   width: 300px;
   height: 500px;
   border-radius: 10px;
@@ -42,7 +42,7 @@ button {
 }
 
 .calculator__display--bare {
-  /* display: none; */
+  display: none;
   background-color: #ffffff;
   text-align: right;
   vertical-align: middle;
@@ -72,8 +72,7 @@ button {
   line-height: 2.1;
 }
 
-/* 결과값만 글자를 크게, 색도 더 진하게 */
-.calculator__display--bare > span.calculator__result { 
+.calculator__display--bare > span.calculator__result {
   /* width: 40px; width를 지정하니까 자릿수가 올라가면 숫자가 전부 보이지 않는 문제 발생*/ 
   font-size: 45px;
   color: #566270;
@@ -81,13 +80,13 @@ button {
 }
 
 .calculator__display--intermediate {
-  display: none; /* 이 줄을 모두 지우면 intermediate, advanced 테스트를 하실 수 있습니다.*/
+  /* display: none; 이 줄을 모두 지우면 intermediate, advanced 테스트를 하실 수 있습니다. */
   background-color: #ffffff;
   height: 100px;
   width: 100%;
   border-radius: 10px;
-  font-size: 24px;
-  text-align: center;
+  font-size: 36px;
+  text-align: right;
   vertical-align: middle;
   padding: 25px 15px;
   overflow: hidden;
@@ -103,6 +102,7 @@ button {
   border-radius: 10px;
   text-align: center;
 }
+
 
 .clear__and__enter {
   height: 60px;
@@ -138,11 +138,15 @@ button {
   border-radius: 50%;
   cursor: pointer;
   outline: none;
-  background-color: #ebebeb;
+  background-color: rgb(255, 255, 255);
   color: #566270;
+  /* Try Neumorphism */
+  border: 1px solid white;
+  box-shadow: -5px -15px 15px rgba(255,255,255,0.05), 5px 15px 15px rgba(0,0,0,0.05), inset 0 -15px 15px rgba(255,255,255,0.05), inset 0 15px 15px rgba(0,0,0,0.05);
 }
 
-.button__row > .operator, .button__row > .decimal { /* .button__row > .operator, .decimal 로 했을 때는 적용 안됨 */
+
+.button__row > .operator {
   color: #ffffff;
   background-color: #566270;
 }
@@ -156,6 +160,24 @@ button {
 .button__row > .isPressed {
   background-color: #00da75;
 }
+
+/* hover, focus */
+.button__row > button:hover, .button__row > button:focus {
+  background-color: rgb(245, 245, 245);
+}
+
+.button__row > .operator:hover, .button__row > .operator:focus {
+  background-color: #444f5a;
+}
+
+.clear__and__enter > button:hover, .clear__and__enter > button:focus {
+  background-color: #f69d21;
+}
+
+.clear__and__enter > button.calculate:hover, .clear__and__enter > button.calculate:focus {
+  background-color: rgb(0, 184, 144);
+}
+
 
 .logo {
   position: fixed;

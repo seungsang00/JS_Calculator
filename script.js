@@ -96,24 +96,77 @@ buttons.addEventListener('click', function (event) {
 
 
 // ! intermediate, advanced test를 위한 코드입니다. 도전하신다면 주석을 해제하세요.
-// const display = document.querySelector('.calculator__display--intermediate'); // calculator__display 엘리먼트와, 그 자식 엘리먼트의 정보를 모두 담고 있습니다.
-// let firstNum, intermediateOperator, previousKey, previousNum;
+const display = document.querySelector('.calculator__display--intermediate'); // calculator__display 엘리먼트와, 그 자식 엘리먼트의 정보를 모두 담고 있습니다.
+let firstNum, intermediateOperator, previousKey, previousNum;
 
-// buttons.addEventListener('click', function (event) {
-//   // 버튼을 눌렀을 때 작동하는 함수입니다.
+buttons.addEventListener('click', function (event) {
+  // 버튼을 눌렀을 때 작동하는 함수입니다.
 
-//   const target = event.target; // 클릭된 HTML 엘리먼트의 정보가 저장되어 있습니다.
-//   const action = target.classList[0]; // 클릭된 HTML 엘리먼트에 클레스 정보를 가져옵니다.
-//   const buttonContent = target.textContent; // 클릭된 HTML 엘리먼트의 텍스트 정보를 가져옵니다.
-//   // ! 위 코드는 수정하지 마세요.
+  const target = event.target; // 클릭된 HTML 엘리먼트의 정보가 저장되어 있습니다.
+  const action = target.classList[0]; // 클릭된 HTML 엘리먼트에 클레스 정보를 가져옵니다.
+  const buttonContent = target.textContent; // 클릭된 HTML 엘리먼트의 텍스트 정보를 가져옵니다.
+  // ! 위 코드는 수정하지 마세요.
 
-//   // ! 여기서부터 intermetiate & advanced 과제룰 풀어주세요.
-//   if (target.matches('button')) {
-//     if (action === 'number') {}
-//     if (action === 'operator') {}
-//     if (action === 'decimal') {}
-//     if (action === 'clear') {}
-//     if (action === 'calculate') {}
-//   }
+  // ! 여기서부터 intermetiate & advanced 과제룰 풀어주세요.
+  if (target.matches('button')) {
+    if (action === 'number') {
+      console.log(previousKey);
+      // previousKey값이 없을 경우, 직전에 누른 버튼이 연산자인 경우, 화면의 숫자가 0인 경우에는 지금 누른 숫자를 화면에 표시하자
+      if (previousKey === undefined || previousKey === 'operator' || display.textContent === '0') {
+        display.textContent = buttonContent;
+      } else if (previousKey === 'number' || previousKey === 'decimal') { // 그게 아니면 화면에 있는 숫자에 지금 누른 숫자를 concat하자
+        display.textContent = display.textContent + buttonContent;
+      }
+      
+      previousKey = 'number'; // 직전에 누른 키 값을 넘버로 바꿔주자
+    }
+    if (action === 'operator') {
+      console.log(previousKey);
 
-// });
+      firstNum = display.textContent; // 화면에 보이는 숫자를 문자열 상태 그대로 따로 저장
+      intermediateOperator = buttonContent; // 클릭한 연산자 정보를 저장
+
+      // 연산자로 바로 계산하기
+      
+
+      previousKey = 'operator'; // 직전에 누른 키값을 연산자로 바꿔주자
+    }
+    if (action === 'decimal') {
+      console.log(previousKey);
+
+      if (display.textContent === '0') {
+        display.textContent = '0.';
+      } else if (previousKey === 'operator') {
+        display.textContent = '0.';
+      } else if (previousKey !== 'decimal'){
+        display.textContent = display.textContent + '.';
+      }
+
+      previousKey = 'decimal'; // 직전에 누른 키값을 'decimal'로 바꿔주자
+    }
+    if (action === 'clear') {
+      console.log(previousKey);
+
+      display.textContent = '0';
+      previousKey = undefined; // 직전에 누른 키값을 undefined로 바꿔주자
+      firstNum = undefined;
+      intermediateOperator = undefined;
+      previousNum = undefined;
+    }
+    if (action === 'calculate') {
+      console.log(previousKey);
+      console.log('직전 숫자는 ' + previousNum);
+      
+      if (intermediateOperator !== undefined) {
+        if ( previousKey !== 'calculate') {
+          previousNum = display.textContent;
+          display.textContent = calculate(firstNum, intermediateOperator, display.textContent);
+        } else {
+          display.textContent = calculate(display.textContent, intermediateOperator, previousNum);
+        }
+      }
+      previousKey = 'calculate'; // 직전에 누른 키값을 'calculate'로 바꿔주자
+    }
+  }
+
+});
