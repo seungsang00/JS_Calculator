@@ -6,6 +6,7 @@ const operator = document.querySelector('.calculator__operator'); // calculator_
 const secondOperend = document.querySelector('.calculator__operend--right'); // calculator__operend--right 엘리먼트와, 그 자식 엘리먼트의 정보를 모두 담고 있습니다.
 const calculatedResult = document.querySelector('.calculator__result'); // calculator__result 엘리먼트와, 그 자식 엘리먼트의 정보를 모두 담고 있습니다.
 
+
 function calculate(n1, operator, n2) {
   let result = 0;
   // TODO : n1과 n2를 operator에 따라 계산하는 함수를 만드세요.
@@ -28,6 +29,7 @@ function calculate(n1, operator, n2) {
   return String(result);
 }
 
+// ! Bare Minimum Requirements에 해당하는 코드입니다.
 buttons.addEventListener('click', function (event) {
   // 버튼을 눌렀을 때 작동하는 함수입니다.
 
@@ -53,26 +55,22 @@ buttons.addEventListener('click', function (event) {
       } else {
         secondOperend.textContent = buttonContent;
       }
-      // else if (clickedBefore === 'operator') {
-      //   secondOperend.textContent = buttonContent;
-      // } else if (clickedBefore !== 'operator') {
-      //   firstOperend.textContent = firstOperend.textContent + buttonContent;
-      // } 
-      console.log('숫자 ' + buttonContent + ' 버튼');
-      console.log(clickedBefore);
+      
+      // console.log('숫자 ' + buttonContent + ' 버튼');
+      // console.log(clickedBefore);
     }
 
     if (action === 'operator') {
       operator.textContent = buttonContent;
       clickedBefore = 'operator'; // 클릭된 HTML 엘리먼트의 클래스 정보를 저장
 
-      console.log('연산자 ' + buttonContent + ' 버튼');
-      console.log(clickedBefore);
+      // console.log('연산자 ' + buttonContent + ' 버튼');
+      // console.log(clickedBefore);
     }
 
     if (action === 'decimal') {
-      console.log('소수점 버튼');
-      console.log(clickedBefore);
+      // console.log('소수점 버튼');
+      // console.log(clickedBefore);
     }
 
     if (action === 'clear') {
@@ -82,14 +80,14 @@ buttons.addEventListener('click', function (event) {
       calculatedResult.textContent = '0';
       clickedBefore = 'number';
 
-      console.log('초기화 버튼');
-      console.log(clickedBefore);
+      // console.log('초기화 버튼');
+      // console.log(clickedBefore);
     }
 
     if (action === 'calculate') {
       calculatedResult.textContent = calculate(firstOperend.textContent, operator.textContent, secondOperend.textContent);
-      console.log('계산 버튼');
-      console.log(clickedBefore);
+      // console.log('계산 버튼');
+      // console.log(clickedBefore);
     }
   }
 });
@@ -99,6 +97,17 @@ buttons.addEventListener('click', function (event) {
 const display = document.querySelector('.calculator__display--intermediate'); // calculator__display 엘리먼트와, 그 자식 엘리먼트의 정보를 모두 담고 있습니다.
 let firstNum, intermediateOperator, previousKey, previousNum;
 
+// div 만들기
+let newDiv = document.createElement('div');
+// 만든 요소의 클래스를 'calculateProcess'로 설정
+newDiv.className = 'calculateProcess';
+newDiv.innerHTML = '0';
+// display 뒤에 삽입해주기
+display.after(newDiv);
+// style 설정하기
+newDiv.style.cssText = `font-size: 12px; font-weight: 400; padding: 0 16px 10px 15px; text-align: right; overflow: hidden; color: #808992;`;
+
+
 buttons.addEventListener('click', function (event) {
   // 버튼을 눌렀을 때 작동하는 함수입니다.
 
@@ -106,38 +115,72 @@ buttons.addEventListener('click', function (event) {
   const action = target.classList[0]; // 클릭된 HTML 엘리먼트에 클레스 정보를 가져옵니다.
   const buttonContent = target.textContent; // 클릭된 HTML 엘리먼트의 텍스트 정보를 가져옵니다.
   // ! 위 코드는 수정하지 마세요.
+  
+  // ! 버튼이 클릭되면 HTML에서 'isPressed' 클래스를 모두 찾아내 지워줍니다.
+  const buttonContainerArray = buttons.children; // calculator__keys 엘리먼트의 자식 엘리먼트의 정보를 모두 담고 있습니다. 아마도...?
+  if (target.matches('button')) { // 클릭된 HTML 엘리먼트의 정보가 'button'인 경우??
+    for (let i = 0; i < buttonContainerArray.length; i++) { 
+      const childrenArray = buttonContainerArray[i].children;
+      for (let j=0; j < childrenArray.length; j++) {
+        childrenArray[j].classList.remove('isPressed');
+      }
+    }
+  }
 
   // ! 여기서부터 intermetiate & advanced 과제룰 풀어주세요.
   if (target.matches('button')) {
     if (action === 'number') {
-      console.log(previousKey);
+      // 계산식을 입력해줍니다.
+      if (newDiv.textContent === '0') { // newDiv의 텍스트가 0이면 입력값없음 상태로 인지
+        newDiv.textContent = buttonContent; // 지금 클릭한 엘리먼트의 텍스트로 교체
+      } else { // 그 외의 경우에는
+        newDiv.textContent = newDiv.textContent + buttonContent; // 지금 클릭한 엘리먼트의 텍스트를 concat
+      }
+
+      console.log('previousKey: ' + previousKey);
+      console.log(buttonContent);
       // previousKey값이 없을 경우, 직전에 누른 버튼이 연산자인 경우, 화면의 숫자가 0인 경우에는 지금 누른 숫자를 화면에 표시하자
       if (previousKey === undefined || previousKey === 'operator' || display.textContent === '0') {
         display.textContent = buttonContent;
+      } else if (buttonContent === '0' && display.textContent === '0.') { // 0,.,0을 차례로 누르면 0.0이 나오는 문제 해결
+        display.textContent = '0';
       } else if (previousKey === 'number' || previousKey === 'decimal') { // 그게 아니면 화면에 있는 숫자에 지금 누른 숫자를 concat하자
         display.textContent = display.textContent + buttonContent;
-      }
+      } 
       
       previousKey = 'number'; // 직전에 누른 키 값을 넘버로 바꿔주자
     }
     if (action === 'operator') {
-      console.log(previousKey);
+      console.log('previousKey: ' + previousKey);
+      console.log(buttonContent);
+
+      target.classList.add('isPressed'); // isPressed 클래스를 추가하자
+
+      if (firstNum && intermediateOperator && previousKey !== 'calculate' && previousKey !== 'operator') {
+        display.textContent = calculate(firstNum, intermediateOperator, display.textContent);
+      }
 
       firstNum = display.textContent; // 화면에 보이는 숫자를 문자열 상태 그대로 따로 저장
       intermediateOperator = buttonContent; // 클릭한 연산자 정보를 저장
-
-      // 연산자로 바로 계산하기
-      
-
+      if (previousKey === 'operator') { // 연산자를 연속해서 클릭한 경우라면 
+        newDiv.textContent = firstNum + intermediateOperator; // 저장해둔 정보를 가져와서 보여주자
+      } else {
+        newDiv.textContent = newDiv.textContent + buttonContent; // 지금 클릭한 엘리먼트의 텍스트를 concat
+      }
       previousKey = 'operator'; // 직전에 누른 키값을 연산자로 바꿔주자
+
+      console.log('방금 저장된 firstNum은 '+firstNum);
     }
     if (action === 'decimal') {
-      console.log(previousKey);
+      console.log('previousKey: ' + previousKey);
+      console.log(buttonContent);
 
       if (display.textContent === '0') {
         display.textContent = '0.';
+        newDiv.textContent = '0.';
       } else if (previousKey === 'operator') {
         display.textContent = '0.';
+        newDiv.textContent = newDiv.textContent + '0.';
       } else if (previousKey !== 'decimal'){
         display.textContent = display.textContent + '.';
       }
@@ -145,28 +188,58 @@ buttons.addEventListener('click', function (event) {
       previousKey = 'decimal'; // 직전에 누른 키값을 'decimal'로 바꿔주자
     }
     if (action === 'clear') {
-      console.log(previousKey);
+      console.log('previousKey: ' + previousKey);
+      console.log(buttonContent);
 
       display.textContent = '0';
+      newDiv.textContent = '0';
       previousKey = undefined; // 직전에 누른 키값을 undefined로 바꿔주자
       firstNum = undefined;
       intermediateOperator = undefined;
       previousNum = undefined;
     }
     if (action === 'calculate') {
-      console.log(previousKey);
+      console.log('previousKey: ' + previousKey);
       console.log('직전 숫자는 ' + previousNum);
+      console.log('=');
       
       if (intermediateOperator !== undefined) {
         if ( previousKey !== 'calculate') {
           previousNum = display.textContent;
-          display.textContent = calculate(firstNum, intermediateOperator, display.textContent);
+          let firstResult = calculate(firstNum, intermediateOperator, display.textContent);
+          display.textContent = firstResult;
+          newDiv.textContent = `${firstNum}${intermediateOperator}${previousNum}=${firstResult}`;
         } else {
-          display.textContent = calculate(display.textContent, intermediateOperator, previousNum);
+          let afterResult = calculate(display.textContent, intermediateOperator, previousNum);
+          newDiv.textContent = `${display.textContent}${intermediateOperator}${previousNum}=${afterResult}`;
+          display.textContent = afterResult;
         }
       }
       previousKey = 'calculate'; // 직전에 누른 키값을 'calculate'로 바꿔주자
     }
   }
 
+  // 숫자가 길어지면 크기 조정
+  if (display.textContent.length < 12) {
+    display.style.fontSize = '36px';
+  } else if (display.textContent.length >= 12 && display.textContent.length < 14) {
+    display.style.fontSize = '30px';
+  } else if (display.textContent.length >= 14 && display.textContent.length < 16) {
+    display.style.fontSize = '27px';
+  } else if (display.textContent.length >= 16 && display.textContent.length < 18) {
+    display.style.fontSize = '24px';
+  } else if (display.textContent.length >= 18 && display.textContent.length < 20) {
+    display.style.fontSize = '21px';
+  } else if (display.textContent.length >= 20 && display.textContent.length < 23) {
+    display.style.fontSize = '18px';
+  } else if (display.textContent.length >= 23 && display.textContent.length < 28) {
+    display.style.fontSize = '15px';
+  } else if (display.textContent.length >= 28 && display.textContent.length < 36) {
+    display.style.fontSize = '12px';
+  } else if (display.textContent.length >= 36 && display.textContent.length < 44) {
+    display.style.fontSize = '9px';
+  } else {
+    display.style.fontSize = '6px'; // 이 이상은 스크롤바가 생기게 하자
+  }
 });
+
