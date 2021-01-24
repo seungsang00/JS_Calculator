@@ -95,7 +95,7 @@ buttons.addEventListener('click', function (event) {
 
 // ! intermediate, advanced test를 위한 코드입니다. 도전하신다면 주석을 해제하세요.
 const display = document.querySelector('.calculator__display--intermediate'); // calculator__display 엘리먼트와, 그 자식 엘리먼트의 정보를 모두 담고 있습니다.
-let firstNum, intermediateOperator, previousKey, previousNum;
+let firstNum, intermediateOperator, previousKey, previousNum, beforeResult;
 
 // div 만들기
 let newDiv = document.createElement('div');
@@ -107,18 +107,169 @@ display.after(newDiv);
 // style 설정하기
 newDiv.style.cssText = `font-size: 12px; font-weight: 400; padding: 0 16px 10px 15px; text-align: right; overflow: hidden; color: #808992;`;
 
+// ! 키보드를 사용했을 때 작동하는 함수입니다.
+window.addEventListener('keyup', function (event) {
+  let keyContent = event.key; // 눌려진 키보드 버튼의 텍스트 정보를 가져옵니다.
+  const buttonContainerArray = buttons.children; // calculator__keys 엘리먼트의 자식 엘리먼트의 정보를 모두 담고 있습니다. 아마도...?
+  
+  for (let i = 0; i < buttonContainerArray.length; i++) { 
+    const childrenArray = buttonContainerArray[i].children;
+    for (let j=0; j < childrenArray.length; j++) {
+      if (childrenArray[j].textContent === 'AC' && keyContent === 'Escape') {
+        childrenArray[j].classList.remove('isPressedClear');
+      } 
+      if (childrenArray[j].textContent === 'Enter' && keyContent === '=') {
+        childrenArray[j].classList.remove('isPressedEnter');
+      } else if (childrenArray[j].textContent === 'Enter' && keyContent === 'Enter') {
+        childrenArray[j].classList.remove('isPressedEnter');
+      }
+      if (childrenArray[j].textContent === keyContent) {
+        childrenArray[j].classList.remove('isPressed');
+      } 
+      console.log(childrenArray[j].className);
+    }
+  }
+})
+window.addEventListener('keydown', function (event) {
+  console.log(event.key);
+  console.log(event);
 
+  let keyContent = event.key; // 눌려진 키보드 버튼의 텍스트 정보를 가져옵니다.
+
+  const buttonContainerArray = buttons.children; // calculator__keys 엘리먼트의 자식 엘리먼트의 정보를 모두 담고 있습니다. 아마도...?
+  console.log(buttonContainerArray);
+  
+  for (let i = 0; i < buttonContainerArray.length; i++) { 
+    const childrenArray = buttonContainerArray[i].children;
+    for (let j=0; j < childrenArray.length; j++) {
+      if (childrenArray[j].textContent === keyContent) {
+        childrenArray[j].classList.add('isPressed');
+      }
+      if (childrenArray[j].className === 'clear' && keyContent === 'Escape') {
+        childrenArray[j].classList.add('isPressedClear');
+      } 
+      if (childrenArray[j].textContent === 'Enter' && keyContent === '=') {
+        childrenArray[j].classList.add('isPressedEnter');
+      } else if (childrenArray[j].textContent === 'Enter' && keyContent === 'Enter') {
+        childrenArray[j].classList.add('isPressedEnter');
+      }
+      
+      // console.log(childrenArray[j]);
+    }
+  }
+  
+
+  if (!isNaN(keyContent)){ // 눌러진 키가 숫자이면
+    
+    if (newDiv.textContent === '0') { // newDiv의 텍스트가 0이면 입력값없음 상태로 인지
+      newDiv.textContent = keyContent; // 지금 클릭한 엘리먼트의 텍스트로 교체
+    } else { // 그 외의 경우에는
+      newDiv.textContent = newDiv.textContent + keyContent; // 지금 클릭한 엘리먼트의 텍스트를 concat
+    }
+
+    if (previousKey === undefined || previousKey === 'operator' || display.textContent === '0') { 
+      display.textContent = keyContent;
+    } else if (previousKey === 'number' || previousKey === 'decimal') { // 그게 아니면 화면에 있는 숫자에 지금 누른 숫자를 concat하자
+      display.textContent = display.textContent + keyContent;
+    } else if (beforeResult !== undefined) {
+      display.textContent = keyContent;
+      newDiv.textContent = keyContent;
+
+      firstNum = undefined;
+      intermediateOperator = undefined;
+      previousNum = undefined;
+      beforeResult = undefined;
+      previousKey = undefined; // 직전에 누른 키값을 undefined로 바꿔주자
+    } else if (keyContent === '0' && display.textContent === '0.') { // 0,.,0을 차례로 누르면 0.0이 나오는 문제 해결
+      display.textContent = '0';
+    } 
+    
+    previousKey = 'number';
+
+  } else if (keyContent === '.') { // 눌린 키가 .이면
+    if (previousKey === 'calculate' || display.textContent === '0') {
+      display.textContent = '0.';
+      newDiv.textContent = '0.';
+    } else if (previousKey === 'operator') {
+      display.textContent = '0.';
+      newDiv.textContent = newDiv.textContent + '0.';
+    } else if (previousKey !== 'decimal'){
+      display.textContent = display.textContent + '.';
+    } else if (previousKey === 'calculate') {
+      display.textContent = '0.';
+    }
+
+    previousKey = 'decimal'; // 직전에 누른 키값을 연산자로 바꿔주자
+
+  } else if (keyContent === '+' || keyContent === '-' || keyContent === '*' || keyContent === '/') {
+    
+    if (beforeResult && previousKey === 'operator') {
+      display.textContent = beforeResult;
+    } else if (previousKey === 'calculate') { // 엔터와 연산자를 연달아 클릭한 경우
+      newDiv.textContent = `${beforeResult}${keyContent}`;
+    } else if (firstNum && intermediateOperator && previousKey !== 'calculate' && previousKey !== 'operator') {
+      display.textContent = calculate(firstNum, intermediateOperator, display.textContent);
+    }
+    
+    firstNum = display.textContent; // 화면에 보이는 숫자를 문자열 상태 그대로 따로 저장
+    intermediateOperator = keyContent; // 클릭한 연산자 정보를 저장
+
+    if (previousKey === 'operator') { // 연산자를 연속해서 클릭한 경우라면 지금 누른 연산자로 바꿔치기 해야한다.
+      newDiv.textContent = firstNum + intermediateOperator; // 저장해둔 정보를 가져와서 보여주자
+    } else if (previousKey === 'calculate') { // 엔터와 연산자를 연달아 클릭한 경우
+      newDiv.textContent = `${beforeResult}${keyContent}`;
+    } else {
+      newDiv.textContent = newDiv.textContent + keyContent; // 지금 클릭한 엘리먼트의 텍스트를 concat
+    }
+
+    previousKey = 'operator'; // 직전에 누른 키값을 연산자로 바꿔주자
+
+  } else if (keyContent === '=' || keyContent === 'Enter') { // 엔터키나 =키로 연산이 가능하게 하자
+    console.log(`firstNum: ${firstNum}, previousKey: ${previousKey}`);
+    if (!previousKey) {
+      display.textContent = '0';
+      newDiv.textContent = '0';
+    } else if (!firstNum && previousKey === 'calculate') {
+      newDiv.textContent = '0';
+    } else if (previousKey !== 'calculate') {
+      previousNum = display.textContent;
+      beforeResult = calculate(firstNum, intermediateOperator, display.textContent);
+      display.textContent = beforeResult;
+      newDiv.textContent = `${firstNum}${intermediateOperator}${previousNum}=${beforeResult}`;
+    } else {
+      let afterResult = calculate(display.textContent, intermediateOperator, previousNum);
+      newDiv.textContent = `${display.textContent}${intermediateOperator}${previousNum}=${afterResult}`;
+      display.textContent = afterResult;
+      beforeResult = afterResult;
+    }
+    
+    previousKey = 'calculate'; // 직전에 누른 키값을 'calculate'로 바꿔주자
+
+  } else if (keyContent === 'Escape') { // Esc 키를 통해 클리어 기능이 가능하게 하자
+    display.textContent = '0';
+    newDiv.textContent = '0';
+    firstNum = undefined;
+    intermediateOperator = undefined;
+    previousNum = undefined;
+    previousKey = undefined; // 직전에 누른 키값을 undefined로 바꿔주자
+  }
+
+  
+})
+
+// ! 버튼을 클릭했을 때 작동하는 함수입니다.
 buttons.addEventListener('click', function (event) {
-  // 버튼을 눌렀을 때 작동하는 함수입니다.
-
+  
   const target = event.target; // 클릭된 HTML 엘리먼트의 정보가 저장되어 있습니다.
   const action = target.classList[0]; // 클릭된 HTML 엘리먼트에 클레스 정보를 가져옵니다.
   const buttonContent = target.textContent; // 클릭된 HTML 엘리먼트의 텍스트 정보를 가져옵니다.
   // ! 위 코드는 수정하지 마세요.
   
+
   // ! 버튼이 클릭되면 HTML에서 'isPressed' 클래스를 모두 찾아내 지워줍니다.
   const buttonContainerArray = buttons.children; // calculator__keys 엘리먼트의 자식 엘리먼트의 정보를 모두 담고 있습니다. 아마도...?
-  if (target.matches('button')) { // 클릭된 HTML 엘리먼트의 정보가 'button'인 경우??
+  console.log(buttonContainerArray);
+  if (target.matches('button')) { // 클릭된 HTML 엘리먼트가 'button'인 경우
     for (let i = 0; i < buttonContainerArray.length; i++) { 
       const childrenArray = buttonContainerArray[i].children;
       for (let j=0; j < childrenArray.length; j++) {
@@ -142,10 +293,20 @@ buttons.addEventListener('click', function (event) {
       // previousKey값이 없을 경우, 직전에 누른 버튼이 연산자인 경우, 화면의 숫자가 0인 경우에는 지금 누른 숫자를 화면에 표시하자
       if (previousKey === undefined || previousKey === 'operator' || display.textContent === '0') {
         display.textContent = buttonContent;
-      } else if (buttonContent === '0' && display.textContent === '0.') { // 0,.,0을 차례로 누르면 0.0이 나오는 문제 해결
-        display.textContent = '0';
       } else if (previousKey === 'number' || previousKey === 'decimal') { // 그게 아니면 화면에 있는 숫자에 지금 누른 숫자를 concat하자
         display.textContent = display.textContent + buttonContent;
+      } else if (beforeResult !== undefined) {
+        console.log(beforeResult);
+        display.textContent = buttonContent;
+        newDiv.textContent = buttonContent;
+        
+        firstNum = undefined;
+        intermediateOperator = undefined;
+        previousNum = undefined;
+        beforeResult = undefined;
+        previousKey = undefined; // 직전에 누른 키값을 undefined로 바꿔주자
+      } else if (buttonContent === '0' && display.textContent === '0.') { // 0,.,0을 차례로 누르면 0.0이 나오는 문제 해결
+        display.textContent = '0';
       } 
       
       previousKey = 'number'; // 직전에 누른 키 값을 넘버로 바꿔주자
@@ -156,7 +317,9 @@ buttons.addEventListener('click', function (event) {
 
       target.classList.add('isPressed'); // isPressed 클래스를 추가하자
 
-      if (firstNum && intermediateOperator && previousKey !== 'calculate' && previousKey !== 'operator') {
+      if (beforeResult && previousKey === 'operator') {
+        display.textContent = beforeResult;
+      } else if (firstNum && intermediateOperator && previousKey !== 'calculate' && previousKey !== 'operator') {
         display.textContent = calculate(firstNum, intermediateOperator, display.textContent);
       }
 
@@ -164,6 +327,8 @@ buttons.addEventListener('click', function (event) {
       intermediateOperator = buttonContent; // 클릭한 연산자 정보를 저장
       if (previousKey === 'operator') { // 연산자를 연속해서 클릭한 경우라면 
         newDiv.textContent = firstNum + intermediateOperator; // 저장해둔 정보를 가져와서 보여주자
+      } else if (previousKey === 'calculate') { // 엔터와 연산자를 연달아 클릭한 경우
+        newDiv.textContent = `${beforeResult}${buttonContent}`;
       } else {
         newDiv.textContent = newDiv.textContent + buttonContent; // 지금 클릭한 엘리먼트의 텍스트를 concat
       }
@@ -175,7 +340,7 @@ buttons.addEventListener('click', function (event) {
       console.log('previousKey: ' + previousKey);
       console.log(buttonContent);
 
-      if (display.textContent === '0') {
+      if (previousKey === 'calculate' || display.textContent === '0') {
         display.textContent = '0.';
         newDiv.textContent = '0.';
       } else if (previousKey === 'operator') {
@@ -183,7 +348,7 @@ buttons.addEventListener('click', function (event) {
         newDiv.textContent = newDiv.textContent + '0.';
       } else if (previousKey !== 'decimal'){
         display.textContent = display.textContent + '.';
-      }
+      } 
 
       previousKey = 'decimal'; // 직전에 누른 키값을 'decimal'로 바꿔주자
     }
@@ -203,16 +368,21 @@ buttons.addEventListener('click', function (event) {
       console.log('직전 숫자는 ' + previousNum);
       console.log('=');
       
-      if (intermediateOperator !== undefined) {
+      if (previousKey === undefined) {
+        display.textContent = '0';
+      } else if (!firstNum && previousKey === 'calculate') {
+        newDiv.textContent = '0';
+      } else if (intermediateOperator !== undefined) {
         if ( previousKey !== 'calculate') {
           previousNum = display.textContent;
-          let firstResult = calculate(firstNum, intermediateOperator, display.textContent);
-          display.textContent = firstResult;
-          newDiv.textContent = `${firstNum}${intermediateOperator}${previousNum}=${firstResult}`;
+          beforeResult = calculate(firstNum, intermediateOperator, display.textContent);
+          display.textContent = beforeResult;
+          newDiv.textContent = `${firstNum}${intermediateOperator}${previousNum}=${beforeResult}`;
         } else {
           let afterResult = calculate(display.textContent, intermediateOperator, previousNum);
           newDiv.textContent = `${display.textContent}${intermediateOperator}${previousNum}=${afterResult}`;
           display.textContent = afterResult;
+          beforeResult = afterResult;
         }
       }
       previousKey = 'calculate'; // 직전에 누른 키값을 'calculate'로 바꿔주자

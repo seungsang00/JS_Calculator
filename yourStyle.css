@@ -191,12 +191,22 @@ button {
   box-shadow: inset -2px -2px 5px rgba(255,255,255,0.05), inset 2px 2px 5px rgba(0,0,0,0.05);
   border: 1px solid #f0f0f03a;
 }
+.clear__and__enter > .isPressedClear {
+  background-color: #fdba5b;
+  box-shadow: inset -2px -2px 5px rgba(255,255,255,0.05), inset 2px 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #f0f0f03a;
+}
 
 .clear__and__enter > button.calculate:hover {
   background-color: #33dac9;
 }
 .clear__and__enter > button.calculate:active {
   background-color: #2fd1c1;
+}
+.clear__and__enter > .isPressedEnter {
+  background-color: #2fd1c1 !important;
+  box-shadow: inset -2px -2px 5px rgba(255,255,255,0.05), inset 2px 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #f0f0f03a;
 }
 
 
